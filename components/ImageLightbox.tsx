@@ -8,9 +8,10 @@ interface ImageLightboxProps {
   upload: Upload | null
   onClose: () => void
   onDelete?: (uploadId: string) => void
+  showComments?: boolean
 }
 
-export default function ImageLightbox({ upload, onClose, onDelete }: ImageLightboxProps) {
+export default function ImageLightbox({ upload, onClose, onDelete, showComments = true }: ImageLightboxProps) {
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -103,10 +104,12 @@ export default function ImageLightbox({ upload, onClose, onDelete }: ImageLightb
         <div className="p-5 bg-cream-50 border-t border-sage-100 flex items-start justify-between gap-4">
           <div className="flex-1">
             <p className="text-sm text-sage-400 mb-2">{formattedDate}</p>
-            {upload.comment ? (
-              <p className="text-gray-700 text-sm leading-relaxed">{upload.comment}</p>
-            ) : (
-              <p className="text-sage-300 italic text-sm">No note added</p>
+            {showComments && (
+              upload.comment ? (
+                <p className="text-gray-700 text-sm leading-relaxed">{upload.comment}</p>
+              ) : (
+                <p className="text-sage-300 italic text-sm">No note added</p>
+              )
             )}
           </div>
 

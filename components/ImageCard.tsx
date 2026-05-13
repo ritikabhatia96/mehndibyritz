@@ -7,9 +7,10 @@ import type { Upload } from '@/types'
 interface ImageCardProps {
   upload: Upload
   onImageClick: (upload: Upload) => void
+  showComments?: boolean
 }
 
-export default function ImageCard({ upload, onImageClick }: ImageCardProps) {
+export default function ImageCard({ upload, onImageClick, showComments = true }: ImageCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [imgError, setImgError] = useState(false)
 
@@ -67,26 +68,24 @@ export default function ImageCard({ upload, onImageClick }: ImageCardProps) {
       <div className="p-3">
         <p className="text-xs text-sage-400 mb-1">{formattedDate}</p>
 
-        {upload.comment ? (
-          <div>
-            <p
-              className={`text-sm text-gray-600 leading-relaxed ${
-                !expanded ? 'line-clamp-2' : ''
-              }`}
-            >
-              {upload.comment}
-            </p>
-            {upload.comment.length > 80 && (
-              <button
-                onClick={() => setExpanded(!expanded)}
-                className="text-xs text-sage-500 hover:text-sage-600 font-medium mt-1 transition-colors"
-              >
-                {expanded ? 'Show less' : 'Read more'}
-              </button>
-            )}
-          </div>
-        ) : (
-          <p className="text-sm text-sage-300 italic">No note added</p>
+        {showComments && (
+          upload.comment ? (
+            <div>
+              <p className={`text-sm text-gray-600 leading-relaxed ${!expanded ? 'line-clamp-2' : ''}`}>
+                {upload.comment}
+              </p>
+              {upload.comment.length > 80 && (
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className="text-xs text-sage-500 hover:text-sage-600 font-medium mt-1 transition-colors"
+                >
+                  {expanded ? 'Show less' : 'Read more'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-sage-300 italic">No note added</p>
+          )
         )}
       </div>
     </div>

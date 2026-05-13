@@ -22,6 +22,7 @@ export default function FolderPage() {
   const [error, setError] = useState('')
   const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null)
   const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadData() {
@@ -31,6 +32,7 @@ export default function FolderPage() {
         if (meRes.ok) {
           const meData = await meRes.json()
           setCurrentUser(meData.username)
+          setCurrentUserRole(meData.role)
           // Redirect to /my-folder if viewing own folder
           if (meData.username === username) {
             router.replace('/my-folder')
@@ -149,6 +151,7 @@ export default function FolderPage() {
                   key={upload.id}
                   upload={upload}
                   onImageClick={setSelectedUpload}
+                  showComments={currentUserRole === 'admin'}
                 />
               ))}
             </div>
@@ -156,7 +159,7 @@ export default function FolderPage() {
         )}
       </main>
 
-      <ImageLightbox upload={selectedUpload} onClose={() => setSelectedUpload(null)} />
+      <ImageLightbox upload={selectedUpload} onClose={() => setSelectedUpload(null)} showComments={currentUserRole === 'admin'} />
     </div>
   )
 }
