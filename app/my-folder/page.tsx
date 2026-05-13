@@ -22,8 +22,8 @@ export default function MyFolderPage() {
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [uploadError, setUploadError] = useState('')
   const [comment, setComment] = useState('')
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -52,38 +52,36 @@ export default function MyFolderPage() {
     load()
   }, [])
 
-  function handleFileChange(file: File) {
-    setSelectedFile(file)
+  function handleFilesChange(files: File[]) {
+    const imageFiles = files.filter(f => f.type.startsWith('image/'))
+    if (imageFiles.length === 0) return
+    setSelectedFiles(imageFiles)
     setUploadError('')
     setUploadSuccess(false)
-
-    const url = URL.createObjectURL(file)
-    setPreviewUrl(url)
+    setPreviewUrls(imageFiles.map(f => URL.createObjectURL(f)))
   }
 
   function onFileInputChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) handleFileChange(file)
+    const files = Array.from(e.target.files || [])
+    if (files.length) handleFilesChange(files)
   }
 
   function onDrop(e: React.DragEvent) {
     e.preventDefault()
     setIsDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file && file.type.startsWith('image/')) {
-      handleFileChange(file)
-    }
+    const files = Array.from(e.dataTransfer.files || [])
+    if (files.length) handleFilesChange(files)
   }
 
   function clearSelection() {
-    setSelectedFile(null)
-    setPreviewUrl(null)
+    setSelectedFiles([])
+    setPreviewUrls([])
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
   async function handleUpload(e: FormEvent) {
     e.preventDefault()
-    if (!selectedFile) {
+    if (selectedFiles.length === 0) {
       setUploadError('Please select an image to upload.')
       return
     }
@@ -93,28 +91,33 @@ export default function MyFolderPage() {
     setUploadSuccess(false)
 
     try {
-      const formData = new FormData()
-      formData.append('image', selectedFile)
-      formData.append('comment', comment)
+      const newUploads: Upload[] = []
+      for (const file of selectedFiles) {
+        const formData = new FormData()
+        formData.append('image', file)
+        formData.append('comment', comment)
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
 
-      const data = await res.json()
+        const data = await res.json()
 
-      if (!res.ok) {
-        setUploadError(data.error || 'Upload failed. Please try again.')
-      } else {
-        setUploadSuccess(true)
-        setComment('')
-        clearSelection()
-        // Add new upload to top of list
-        setUploads((prev) => [data.upload, ...prev])
+        if (!res.ok) {
+          setUploadError(data.error || 'Upload failed. Please try again.')
+          setUploading(false)
+          return
+        }
 
-        setTimeout(() => setUploadSuccess(false), 4000)
+        newUploads.push(data.upload)
       }
+
+      setUploadSuccess(true)
+      setComment('')
+      clearSelection()
+      setUploads((prev) => [...newUploads.reverse(), ...prev])
+      setTimeout(() => setUploadSuccess(false), 4000)
     } catch {
       setUploadError('Network error. Please try again.')
     } finally {
@@ -210,7 +213,7 @@ export default function MyFolderPage() {
               className={`relative border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
                 isDragging
                   ? 'border-sage-400 bg-sage-50'
-                  : selectedFile
+                  : selectedFiles.length > 0
                   ? 'border-sage-300 bg-sage-50'
                   : 'border-sage-200 hover:border-sage-300 hover:bg-cream-50'
               }`}
@@ -219,19 +222,27 @@ export default function MyFolderPage() {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 onChange={onFileInputChange}
                 className="hidden"
               />
 
-              {previewUrl ? (
+              {previewUrls.length > 0 ? (
                 <div className="space-y-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="max-h-48 mx-auto rounded-xl object-contain shadow-sm"
-                  />
-                  <p className="text-sm text-sage-500 font-medium">{selectedFile?.name}</p>
+                  <div className={`grid gap-2 ${previewUrls.length === 1 ? 'grid-cols-1' : previewUrls.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                    {previewUrls.map((url, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={i}
+                        src={url}
+                        alt={`Preview ${i + 1}`}
+                        className="w-full max-h-36 rounded-xl object-cover shadow-sm"
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm text-sage-500 font-medium">
+                    {selectedFiles.length} {selectedFiles.length === 1 ? 'photo' : 'photos'} selected
+                  </p>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); clearSelection() }}
@@ -255,7 +266,7 @@ export default function MyFolderPage() {
                     <p className="text-sage-400 text-sm mt-1">
                       Drag & drop or <span className="text-sage-500 font-medium underline">click to browse</span>
                     </p>
-                    <p className="text-sage-300 text-xs mt-1">JPEG, PNG, WebP, GIF up to 10MB</p>
+                    <p className="text-sage-300 text-xs mt-1">JPEG, PNG, WebP, GIF up to 10MB · select multiple</p>
                   </div>
                 </div>
               )}
@@ -292,7 +303,7 @@ export default function MyFolderPage() {
             {/* Upload button */}
             <button
               type="submit"
-              disabled={uploading || !selectedFile}
+              disabled={uploading || selectedFiles.length === 0}
               className="w-full py-3 px-6 bg-sage-500 hover:bg-sage-600 disabled:bg-sage-300 text-white font-semibold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2"
             >
               {uploading ? (
@@ -308,7 +319,7 @@ export default function MyFolderPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                   </svg>
-                  Upload Photo
+                  Submit
                 </>
               )}
             </button>
