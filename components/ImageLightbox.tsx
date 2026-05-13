@@ -92,12 +92,12 @@ export default function ImageLightbox({ upload, onClose, onDelete, onCommentUpda
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className="relative w-full bg-white rounded-2xl overflow-hidden shadow-2xl"
-        style={{ maxWidth: 'min(95vw, 1100px)' }}
+        className="relative w-full bg-white rounded-2xl overflow-y-auto shadow-2xl flex flex-col"
+        style={{ maxWidth: 'min(95vw, 1100px)', maxHeight: '95vh' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -112,7 +112,7 @@ export default function ImageLightbox({ upload, onClose, onDelete, onCommentUpda
         </button>
 
         {/* Image */}
-        <div className="relative w-full bg-sage-50" style={{ height: '80vh' }}>
+        <div className="relative w-full bg-sage-50 flex-shrink-0" style={{ height: 'min(60vh, 600px)' }}>
           <Image
             src={imageUrl}
             alt={upload.comment || 'Inspiration photo'}
@@ -124,7 +124,7 @@ export default function ImageLightbox({ upload, onClose, onDelete, onCommentUpda
         </div>
 
         {/* Info panel */}
-        <div className="p-5 bg-cream-50 border-t border-sage-100 flex items-start justify-between gap-4">
+        <div className="p-5 bg-cream-50 border-t border-sage-100 flex items-start justify-between gap-4 flex-shrink-0">
           <div className="flex-1 min-w-0">
             <p className="text-sm text-sage-400 mb-2">{formattedDate}</p>
             {showComments && (
