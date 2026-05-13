@@ -8,12 +8,16 @@ interface ImageLightboxProps {
   upload: Upload | null
   onClose: () => void
   onDelete?: (uploadId: string) => void
+  onCommentUpdate?: (uploadId: string, comment: string) => void
   showComments?: boolean
 }
 
-export default function ImageLightbox({ upload, onClose, onDelete, showComments = true }: ImageLightboxProps) {
+export default function ImageLightbox({ upload, onClose, onDelete, onCommentUpdate, showComments = true }: ImageLightboxProps) {
   const [confirming, setConfirming] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [editingComment, setEditingComment] = useState(false)
+  const [commentDraft, setCommentDraft] = useState('')
+  const [savingComment, setSavingComment] = useState(false)
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -35,6 +39,8 @@ export default function ImageLightbox({ upload, onClose, onDelete, showComments 
 
   useEffect(() => {
     setConfirming(false)
+    setEditingComment(false)
+    setCommentDraft(upload?.comment || '')
   }, [upload])
 
   if (!upload) return null
@@ -44,6 +50,24 @@ export default function ImageLightbox({ upload, onClose, onDelete, showComments 
     month: 'long',
     day: 'numeric',
   })
+
+  async function handleSaveComment() {
+    if (!upload) return
+    setSavingComment(true)
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uploadId: upload.id, comment: commentDraft }),
+      })
+      if (res.ok) {
+        onCommentUpdate?.(upload.id, commentDraft.trim())
+        setEditingComment(false)
+      }
+    } finally {
+      setSavingComment(false)
+    }
+  }
 
   async function handleDelete() {
     if (!upload) return
@@ -101,13 +125,56 @@ export default function ImageLightbox({ upload, onClose, onDelete, showComments 
 
         {/* Info panel */}
         <div className="p-5 bg-cream-50 border-t border-sage-100 flex items-start justify-between gap-4">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <p className="text-sm text-sage-400 mb-2">{formattedDate}</p>
             {showComments && (
-              upload.comment ? (
-                <p className="text-gray-700 text-sm leading-relaxed">{upload.comment}</p>
+              editingComment ? (
+                <div className="space-y-2">
+                  <textarea
+                    value={commentDraft}
+                    onChange={(e) => setCommentDraft(e.target.value)}
+                    rows={3}
+                    autoFocus
+                    className="w-full px-3 py-2 rounded-lg border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-transparent bg-white text-gray-800 placeholder-sage-300 resize-none text-sm"
+                    placeholder="Add a note..."
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveComment}
+                      disabled={savingComment}
+                      className="text-sm px-3 py-1.5 rounded-lg bg-sage-500 hover:bg-sage-600 text-white transition-colors disabled:opacity-50"
+                    >
+                      {savingComment ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => { setEditingComment(false); setCommentDraft(upload.comment || '') }}
+                      className="text-sm px-3 py-1.5 rounded-lg bg-sage-100 hover:bg-sage-200 text-sage-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <p className="text-sage-300 italic text-sm">No note added</p>
+                <div className="group/comment flex items-start gap-2">
+                  <div className="flex-1">
+                    {upload.comment ? (
+                      <p className="text-gray-700 text-sm leading-relaxed">{upload.comment}</p>
+                    ) : (
+                      <p className="text-sage-300 italic text-sm">No note added</p>
+                    )}
+                  </div>
+                  {onCommentUpdate && (
+                    <button
+                      onClick={() => { setCommentDraft(upload.comment || ''); setEditingComment(true) }}
+                      className="flex-shrink-0 text-sage-300 hover:text-sage-500 transition-colors mt-0.5"
+                      aria-label="Edit note"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               )
             )}
           </div>

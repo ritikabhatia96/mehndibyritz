@@ -2,6 +2,50 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin, getImageUrl } from '@/lib/supabase'
 import { getSession } from '@/lib/session'
 
+export async function PATCH(request: NextRequest) {
+  try {
+    const session = await getSession()
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { uploadId, comment } = await request.json()
+    if (!uploadId) {
+      return NextResponse.json({ error: 'Missing upload ID' }, { status: 400 })
+    }
+
+    const { data: upload } = await supabaseAdmin
+      .from('uploads')
+      .select('user_id')
+      .eq('id', uploadId)
+      .single()
+
+    if (!upload) {
+      return NextResponse.json({ error: 'Upload not found' }, { status: 404 })
+    }
+
+    if (upload.user_id !== session.id && session.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const { data: updated, error } = await supabaseAdmin
+      .from('uploads')
+      .update({ comment: comment?.trim() || null })
+      .eq('id', uploadId)
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to update comment' }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, upload: updated })
+  } catch (err) {
+    console.error('Patch error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const session = await getSession()

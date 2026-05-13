@@ -331,6 +331,10 @@ export default function MyFolderPage() {
         upload={selectedUpload}
         onClose={() => setSelectedUpload(null)}
         onDelete={(id) => setUploads((prev) => prev.filter((u) => u.id !== id))}
+        onCommentUpdate={(id, comment) => {
+          setUploads((prev) => prev.map((u) => u.id === id ? { ...u, comment } : u))
+          setSelectedUpload((prev) => prev ? { ...prev, comment } : prev)
+        }}
       />
     </div>
   )
