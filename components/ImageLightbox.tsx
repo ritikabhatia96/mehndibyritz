@@ -72,7 +72,8 @@ export default function ImageLightbox({ upload, onClose, onDelete, showComments 
       onClick={onClose}
     >
       <div
-        className="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl"
+        className="relative w-full bg-white rounded-2xl overflow-hidden shadow-2xl"
+        style={{ maxWidth: 'min(95vw, 1100px)' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -87,17 +88,15 @@ export default function ImageLightbox({ upload, onClose, onDelete, showComments 
         </button>
 
         {/* Image */}
-        <div className="relative w-full" style={{ maxHeight: '70vh' }}>
-          <div className="relative w-full aspect-video bg-sage-50">
-            <Image
-              src={imageUrl}
-              alt={upload.comment || 'Inspiration photo'}
-              fill
-              className="object-contain"
-              sizes="(max-width: 1024px) 100vw, 896px"
-              priority
-            />
-          </div>
+        <div className="relative w-full bg-sage-50" style={{ height: '80vh' }}>
+          <Image
+            src={imageUrl}
+            alt={upload.comment || 'Inspiration photo'}
+            fill
+            className="object-contain"
+            sizes="95vw"
+            priority
+          />
         </div>
 
         {/* Info panel */}
