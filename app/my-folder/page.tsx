@@ -52,13 +52,41 @@ export default function MyFolderPage() {
     load()
   }, [])
 
-  function handleFilesChange(files: File[]) {
+  async function compressImage(file: File): Promise<File> {
+    return new Promise((resolve) => {
+      const img = new Image()
+      const url = URL.createObjectURL(file)
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        const MAX = 1920
+        let { width, height } = img
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round((height * MAX) / width); width = MAX }
+          else { width = Math.round((width * MAX) / height); height = MAX }
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
+        canvas.toBlob(
+          (blob) => resolve(blob ? new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }) : file),
+          'image/jpeg',
+          0.82
+        )
+      }
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file) }
+      img.src = url
+    })
+  }
+
+  async function handleFilesChange(files: File[]) {
     const imageFiles = files.filter(f => f.type.startsWith('image/'))
     if (imageFiles.length === 0) return
-    setSelectedFiles(imageFiles)
     setUploadError('')
     setUploadSuccess(false)
     setPreviewUrls(imageFiles.map(f => URL.createObjectURL(f)))
+    const compressed = await Promise.all(imageFiles.map(compressImage))
+    setSelectedFiles(compressed)
   }
 
   function onFileInputChange(e: ChangeEvent<HTMLInputElement>) {
