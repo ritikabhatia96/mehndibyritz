@@ -146,7 +146,7 @@ export default function SignupPage() {
               onChange={(e) => setSignupCode(e.target.value)}
               required
               className="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-transparent bg-cream-50 text-gray-800 placeholder-sage-300 transition-shadow"
-              placeholder="Enter the code Ritz gave you"
+              placeholder="Enter the code Ritika gave you"
             />
           </div>
 

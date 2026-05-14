@@ -174,9 +174,9 @@ export default function MyFolderPage() {
         />
       )}
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-4">
           <h1 className="font-playfair text-4xl font-bold text-henna-500 mb-1">
             My Board
           </h1>
@@ -184,7 +184,7 @@ export default function MyFolderPage() {
         </div>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-4">
           <div className="flex-1 h-px bg-sage-200" />
           <span className="text-henna-500 font-semibold text-lg">Your Uploads</span>
           <div className="flex-1 h-px bg-sage-200" />
@@ -192,7 +192,7 @@ export default function MyFolderPage() {
 
         {/* Uploads grid */}
         {uploads.length === 0 ? (
-          <div className="text-center py-10">
+          <div className="text-center py-4">
             {/* Henna flower SVG */}
             <div className="flex justify-center mb-5 opacity-25">
               <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -210,8 +210,7 @@ export default function MyFolderPage() {
               Here you can upload inspiration pictures for your next mehndi appointment! Ritika will look through your picks to get a feel for your vibe.
             </p>
             <div className="bg-white border border-sage-100 rounded-2xl p-5 max-w-sm mx-auto shadow-sm mb-3">
-              <p className="text-sage-500 text-sm font-medium mb-1">✨ Need some inspo first?</p>
-              <p className="text-sage-400 text-sm mb-4">Browse the Community Board to see what other clients are loving — tap <span className="font-semibold">+</span> to save any pic straight to your board.</p>
+              <p className="text-sage-500 text-sm font-medium mb-4">✨ Need some inspo first?</p>
               <a
                 href="/community"
                 className="inline-block bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
@@ -219,7 +218,12 @@ export default function MyFolderPage() {
                 Browse Community Board
               </a>
             </div>
-            <p className="text-sage-300 text-xs">Or scroll down to upload your own photos</p>
+            <p className="text-sage-400 text-xs mb-2">Or scroll down to upload your own photos</p>
+            <div className="flex justify-center animate-bounce">
+              <svg className="w-5 h-5 text-sage-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
           </div>
         ) : (
           <>
@@ -316,7 +320,7 @@ export default function MyFolderPage() {
             {/* Comment textarea */}
             <div>
               <label className="block text-sm font-medium text-sage-600 mb-1.5">
-                Add a note for Ritz
+                Add a note for Ritika
               </label>
               <textarea
                 value={comment}
