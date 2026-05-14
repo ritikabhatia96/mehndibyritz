@@ -1,8 +1,9 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function HomePage() {
   return (
-    <div className="h-screen bg-cream-100 flex flex-col items-center justify-between py-8 px-6 overflow-hidden">
+    <div className="min-h-screen bg-cream-100 flex flex-col items-center justify-between py-6 px-4">
 
       {/* Hero */}
       <section className="flex flex-col items-center text-center">
@@ -20,15 +21,30 @@ export default function HomePage() {
       </section>
 
       {/* About */}
-      <section className="w-full max-w-2xl text-center">
-        <div className="bg-white rounded-3xl shadow-sm border border-sage-100 px-10 py-8">
-          <h2 className="font-playfair text-xl text-henna-500 mb-4">About</h2>
-          <p className="text-gray-600 leading-relaxed mb-3 text-sm">
-            Welcome! I&apos;m Ritika, a mehndi artist passionate about creating beautiful, intricate designs for every occasion. Whether you&apos;re celebrating a wedding, a festival, or simply treating yourself, I bring your vision to life with care and creativity.
-          </p>
-          <p className="text-gray-600 leading-relaxed text-sm">
-            Each design is custom and personal — crafted just for you. Browse my work on Instagram or log in to your client portal to share inspiration photos and notes for your next appointment.
-          </p>
+      <section className="w-full max-w-3xl">
+        <div className="bg-white rounded-3xl shadow-sm border border-sage-100 px-5 py-5 flex flex-col sm:flex-row items-center gap-5">
+          {/* Photo */}
+          <div className="flex-shrink-0">
+            <div className="w-28 h-28 sm:w-48 sm:h-48 rounded-full overflow-hidden border-4 border-blush-200 shadow-md">
+              <Image
+                src="/ritika.jpeg"
+                alt="Ritika"
+                width={192}
+                height={192}
+                className="w-full h-full object-cover"
+                style={{ objectPosition: '50% 25%' }}
+              />
+            </div>
+          </div>
+          {/* Text */}
+          <div className="text-center sm:text-left">
+            <p className="text-gray-600 leading-relaxed mb-3 text-sm">
+              Welcome! I&apos;m Ritika, a mehndi artist passionate about creating beautiful, intricate designs for every occasion. Whether you&apos;re celebrating a wedding, a festival, or simply treating yourself, I bring your vision to life with care and creativity.
+            </p>
+            <p className="text-gray-600 leading-relaxed text-sm">
+              Browse my work on Instagram or log in to your client portal to share inspiration photos and notes for your next appointment.
+            </p>
+          </div>
         </div>
       </section>
 
