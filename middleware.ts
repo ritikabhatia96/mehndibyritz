@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Allow public pages and auth API routes
-  if (pathname === '/' || pathname === '/login' || pathname.startsWith('/api/auth/')) {
+  if (pathname === '/' || pathname === '/login' || pathname === '/signup' || pathname.startsWith('/api/auth/')) {
     return NextResponse.next()
   }
 
