@@ -159,7 +159,15 @@ export default function FolderPage() {
         )}
       </main>
 
-      <ImageLightbox upload={selectedUpload} onClose={() => setSelectedUpload(null)} showComments={currentUserRole === 'admin'} />
+      <ImageLightbox
+        upload={selectedUpload}
+        onClose={() => setSelectedUpload(null)}
+        showComments={currentUserRole === 'admin'}
+        onDelete={currentUserRole === 'admin' ? (id) => {
+          setData((prev) => prev ? { ...prev, uploads: prev.uploads.filter((u) => u.id !== id) } : prev)
+          setSelectedUpload(null)
+        } : undefined}
+      />
     </div>
   )
 }

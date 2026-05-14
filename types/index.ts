@@ -30,4 +30,5 @@ export interface CustomerBoard {
   display_name: string
   upload_count: number
   latest_image_path: string | null
+  latest_upload_at: string | null
 }

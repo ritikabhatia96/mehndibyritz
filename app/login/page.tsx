@@ -27,7 +27,7 @@ export default function LoginPage() {
       if (!res.ok) {
         setError(data.error || 'Sign in failed. Please try again.')
       } else {
-        router.push('/dashboard')
+        router.push('/my-folder')
         router.refresh()
       }
     } catch {

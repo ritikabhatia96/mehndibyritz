@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -12,8 +12,33 @@ interface NavBarProps {
 
 export default function NavBar({ username, displayName, role }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [hasNewUploads, setHasNewUploads] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
+
+  useEffect(() => {
+    if (role !== 'admin') return
+
+    async function checkActivity() {
+      try {
+        const res = await fetch('/api/admin/activity')
+        if (!res.ok) return
+        const { latestUploadAt } = await res.json()
+        if (!latestUploadAt) return
+        const lastVisit = localStorage.getItem('adminBoardsLastVisit')
+        if (!lastVisit || new Date(latestUploadAt) > new Date(lastVisit)) {
+          setHasNewUploads(true)
+        }
+      } catch {}
+    }
+
+    checkActivity()
+
+    // Clear red dot when Client Boards page marks itself visited
+    function onVisited() { setHasNewUploads(false) }
+    window.addEventListener('adminBoardsVisited', onVisited)
+    return () => window.removeEventListener('adminBoardsVisited', onVisited)
+  }, [role])
 
   function navClass(href: string) {
     const isActive = pathname === href || pathname.startsWith(href + '/')
@@ -33,12 +58,20 @@ export default function NavBar({ username, displayName, role }: NavBarProps) {
         <div className="flex items-center h-20">
           {/* Desktop nav links - left */}
           <div className="hidden md:flex items-center gap-6 flex-1">
-            <Link href="/dashboard" className={navClass('/dashboard')}>
-              Browse Boards
-            </Link>
             <Link href="/my-folder" className={navClass('/my-folder')}>
               My Board
             </Link>
+            <Link href="/community" className={navClass('/community')}>
+              Community
+            </Link>
+            {role === 'admin' && (
+              <Link href="/dashboard" className={`relative ${navClass('/dashboard')}`}>
+                Client Boards
+                {hasNewUploads && (
+                  <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-blush-500 rounded-full" />
+                )}
+              </Link>
+            )}
             {role === 'admin' && (
               <Link href="/admin" className={navClass('/admin')}>
                 Admin
@@ -111,19 +144,28 @@ export default function NavBar({ username, displayName, role }: NavBarProps) {
             Hello, <span className="font-semibold text-sage-600">{displayName}</span>
           </div>
           <Link
-            href="/dashboard"
-            onClick={() => setMobileOpen(false)}
-            className={`block py-2 ${pathname === '/dashboard' ? 'text-henna-500 font-bold' : 'text-sage-600 font-medium'}`}
-          >
-            Browse Boards
-          </Link>
-          <Link
             href="/my-folder"
             onClick={() => setMobileOpen(false)}
             className={`block py-2 ${pathname === '/my-folder' ? 'text-henna-500 font-bold' : 'text-sage-600 font-medium'}`}
           >
             My Board
           </Link>
+          <Link
+            href="/community"
+            onClick={() => setMobileOpen(false)}
+            className={`block py-2 ${pathname === '/community' ? 'text-henna-500 font-bold' : 'text-sage-600 font-medium'}`}
+          >
+            Community
+          </Link>
+          {role === 'admin' && (
+            <Link
+              href="/dashboard"
+              onClick={() => setMobileOpen(false)}
+              className={`block py-2 ${pathname === '/dashboard' ? 'text-henna-500 font-bold' : 'text-sage-600 font-medium'}`}
+            >
+              Client Boards
+            </Link>
+          )}
           {role === 'admin' && (
             <Link
               href="/admin"
