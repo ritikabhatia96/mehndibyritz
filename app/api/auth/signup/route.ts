@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
     }
 
-    if (signupCode.trim() !== process.env.SIGNUP_CODE) {
+    if (signupCode.trim().toLowerCase() !== process.env.SIGNUP_CODE?.toLowerCase()) {
       return NextResponse.json({ error: 'Invalid invite code.' }, { status: 401 })
     }
 
