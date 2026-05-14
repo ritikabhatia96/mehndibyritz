@@ -192,9 +192,9 @@ export default function MyFolderPage() {
 
         {/* Uploads grid */}
         {uploads.length === 0 ? (
-          <div className="text-center py-16">
+          <div className="text-center py-10">
             {/* Henna flower SVG */}
-            <div className="flex justify-center mb-4 opacity-30">
+            <div className="flex justify-center mb-5 opacity-25">
               <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
                 {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
                   <g key={i} transform={`rotate(${angle} 40 40)`}>
@@ -205,8 +205,21 @@ export default function MyFolderPage() {
                 <circle cx="40" cy="40" r="5" fill="#fdf8f0" />
               </svg>
             </div>
-            <p className="text-sage-400 font-medium text-lg mb-1">No uploads yet</p>
-            <p className="text-sage-300 text-sm">Share your first inspiration photo below!</p>
+            <h2 className="font-playfair text-2xl font-bold text-henna-500 mb-2">Welcome to your board!</h2>
+            <p className="text-sage-500 text-sm max-w-sm mx-auto mb-6">
+              Here you can upload inspiration pictures for your next mehndi appointment! Ritika will look through your picks to get a feel for your vibe.
+            </p>
+            <div className="bg-white border border-sage-100 rounded-2xl p-5 max-w-sm mx-auto shadow-sm mb-3">
+              <p className="text-sage-500 text-sm font-medium mb-1">✨ Need some inspo first?</p>
+              <p className="text-sage-400 text-sm mb-4">Browse the Community Board to see what other clients are loving — tap <span className="font-semibold">+</span> to save any pic straight to your board.</p>
+              <a
+                href="/community"
+                className="inline-block bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              >
+                Browse Community Board
+              </a>
+            </div>
+            <p className="text-sage-300 text-xs">Or scroll down to upload your own photos</p>
           </div>
         ) : (
           <>

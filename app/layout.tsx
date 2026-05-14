@@ -23,7 +23,7 @@ const corinthia = Corinthia({
 
 export const metadata: Metadata = {
   title: 'Mehndibyritz — Inspiration Portal',
-  description: 'Share and browse henna inspiration photos with Ritz',
+  description: 'Share and browse mehndi inspiration photos with Ritz',
 }
 
 export default function RootLayout({

@@ -24,7 +24,7 @@ export default function HomePage() {
         <div className="bg-white rounded-3xl shadow-sm border border-sage-100 px-10 py-8">
           <h2 className="font-playfair text-xl text-henna-500 mb-4">About</h2>
           <p className="text-gray-600 leading-relaxed mb-3 text-sm">
-            Welcome! I&apos;m Ritz, a henna artist passionate about creating beautiful, intricate designs for every occasion. Whether you&apos;re celebrating a wedding, a festival, or simply treating yourself, I bring your vision to life with care and creativity.
+            Welcome! I&apos;m Ritz, a mehndi artist passionate about creating beautiful, intricate designs for every occasion. Whether you&apos;re celebrating a wedding, a festival, or simply treating yourself, I bring your vision to life with care and creativity.
           </p>
           <p className="text-gray-600 leading-relaxed text-sm">
             Each design is custom and personal — crafted just for you. Browse my work on Instagram or log in to your client portal to share inspiration photos and notes for your next appointment.
