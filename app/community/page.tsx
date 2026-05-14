@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import NavBar from '@/components/NavBar'
+import ImageLightbox from '@/components/ImageLightbox'
+import type { Upload } from '@/types'
 
 interface SessionUser {
   id: string
@@ -28,6 +30,7 @@ export default function CommunityPage() {
   const [saving, setSaving] = useState<Record<string, boolean>>({})
   const [saved, setSaved] = useState<Record<string, boolean>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [selectedUpload, setSelectedUpload] = useState<Upload | null>(null)
 
   useEffect(() => {
     async function load() {
@@ -143,7 +146,10 @@ export default function CommunityPage() {
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border border-sage-100 hover:border-sage-300 group"
                 >
                   {/* Image */}
-                  <div className="relative w-full aspect-square bg-sage-50">
+                  <div
+                    className="relative w-full aspect-square bg-sage-50 cursor-pointer"
+                    onClick={() => setSelectedUpload({ id: upload.id, user_id: upload.user_id, image_path: upload.image_path, image_url: upload.image_url, comment: null, created_at: upload.created_at })}
+                  >
                     <Image
                       src={upload.image_url}
                       alt={`Inspo by ${upload.uploader_name}`}
@@ -151,6 +157,11 @@ export default function CommunityPage() {
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+                        View full size
+                      </span>
+                    </div>
                   </div>
 
                   {/* Info + save button */}
@@ -200,6 +211,12 @@ export default function CommunityPage() {
           </div>
         )}
       </main>
+
+      <ImageLightbox
+        upload={selectedUpload}
+        onClose={() => setSelectedUpload(null)}
+        showComments={false}
+      />
     </div>
   )
 }
