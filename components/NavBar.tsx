@@ -21,7 +21,7 @@ export default function NavBar({ username, displayName, role }: NavBarProps) {
 
     async function checkActivity() {
       try {
-        const res = await fetch('/api/admin/activity')
+        const res = await fetch('/api/admin/activity', { cache: 'no-store' })
         if (!res.ok) return
         const { latestUploadAt } = await res.json()
         if (!latestUploadAt) return
@@ -33,11 +33,14 @@ export default function NavBar({ username, displayName, role }: NavBarProps) {
     }
 
     checkActivity()
+    const interval = setInterval(checkActivity, 30000)
 
-    // Clear red dot when Client Boards page marks itself visited
     function onVisited() { setHasNewUploads(false) }
     window.addEventListener('adminBoardsVisited', onVisited)
-    return () => window.removeEventListener('adminBoardsVisited', onVisited)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('adminBoardsVisited', onVisited)
+    }
   }, [role])
 
   function navClass(href: string) {

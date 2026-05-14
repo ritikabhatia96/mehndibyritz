@@ -93,19 +93,21 @@ export default function ClientBoardsGrid({ boards, currentUserId }: Props) {
                 </div>
               )}
 
-              {/* New badge */}
-              {isNew && !isOwn && (
-                <div className="absolute bottom-2 left-2 bg-henna-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm animate-pulse">
-                  New
-                </div>
-              )}
             </div>
 
-            <div className="p-3">
-              <h3 className="font-playfair font-semibold text-henna-500 text-base truncate">
-                {board.display_name}
-              </h3>
-              <p className="text-sage-400 text-xs mt-0.5">@{board.username}</p>
+            <div className="p-3 flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="font-playfair font-semibold text-henna-500 text-base truncate">
+                  {board.display_name}
+                </h3>
+                <p className="text-sage-400 text-xs mt-0.5">@{board.username}</p>
+              </div>
+              {isNew && !isOwn && (
+                <span className="flex items-center gap-1 flex-shrink-0">
+                  <span className="w-2 h-2 bg-blush-500 rounded-full animate-pulse" />
+                  <span className="text-xs font-semibold text-blush-500">New</span>
+                </span>
+              )}
             </div>
           </Link>
         )
