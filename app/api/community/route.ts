@@ -17,15 +17,23 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load community board' }, { status: 500 })
   }
 
-  const uploads = (data || []).map((row: any) => ({
-    id: row.id,
-    user_id: row.user_id,
-    image_path: row.image_path,
-    created_at: row.created_at,
-    image_url: getImageUrl(row.image_path),
-    uploader_name: row.users?.display_name || 'Unknown',
-    uploader_username: row.users?.username || '',
-  }))
+  // Deduplicate by image_path — only show the original (earliest) upload of each unique image
+  const seen = new Set<string>()
+  const uploads = (data || [])
+    .filter((row: any) => {
+      if (seen.has(row.image_path)) return false
+      seen.add(row.image_path)
+      return true
+    })
+    .map((row: any) => ({
+      id: row.id,
+      user_id: row.user_id,
+      image_path: row.image_path,
+      created_at: row.created_at,
+      image_url: getImageUrl(row.image_path),
+      uploader_name: row.users?.display_name || 'Unknown',
+      uploader_username: row.users?.username || '',
+    }))
 
   return NextResponse.json({ uploads })
 }
@@ -56,42 +64,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'This is already your photo' }, { status: 400 })
   }
 
-  // Download the original file from storage
-  const { data: fileData, error: downloadError } = await supabaseAdmin.storage
-    .from('inspirations')
-    .download(original.image_path)
-
-  if (downloadError || !fileData) {
-    return NextResponse.json({ error: 'Failed to copy image' }, { status: 500 })
-  }
-
-  // Re-upload under the current user's folder
-  const ext = original.image_path.split('.').pop() || 'jpg'
-  const newPath = `${session.id}/${crypto.randomUUID()}.${ext}`
-
-  const buffer = await fileData.arrayBuffer()
-  const { error: uploadError } = await supabaseAdmin.storage
-    .from('inspirations')
-    .upload(newPath, buffer, { contentType: fileData.type, upsert: false })
-
-  if (uploadError) {
-    return NextResponse.json({ error: 'Failed to save image' }, { status: 500 })
-  }
-
-  // Insert new DB record
+  // Reuse the original image_path so community board can deduplicate
   const { data: newUpload, error: dbError } = await supabaseAdmin
     .from('uploads')
-    .insert({ user_id: session.id, image_path: newPath, comment: null })
+    .insert({ user_id: session.id, image_path: original.image_path, comment: null })
     .select()
     .single()
 
   if (dbError) {
-    await supabaseAdmin.storage.from('inspirations').remove([newPath])
     return NextResponse.json({ error: 'Failed to save to your board' }, { status: 500 })
   }
 
   return NextResponse.json({
     success: true,
-    upload: { ...newUpload, image_url: getImageUrl(newPath) },
+    upload: { ...newUpload, image_url: getImageUrl(original.image_path) },
   })
 }
