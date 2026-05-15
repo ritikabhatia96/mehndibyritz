@@ -10,15 +10,24 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { data, error } = await supabaseAdmin
-    .from('uploads')
-    .select('id, user_id, image_path, created_at, users(display_name, username)')
-    .is('source_upload_id', null)
-    .order('created_at', { ascending: false })
+  const [{ data, error }, { data: mysaves }] = await Promise.all([
+    supabaseAdmin
+      .from('uploads')
+      .select('id, user_id, image_path, created_at, users(display_name, username)')
+      .is('source_upload_id', null)
+      .order('created_at', { ascending: false }),
+    supabaseAdmin
+      .from('uploads')
+      .select('source_upload_id')
+      .eq('user_id', session.id)
+      .not('source_upload_id', 'is', null),
+  ])
 
   if (error) {
     return NextResponse.json({ error: 'Failed to load community board' }, { status: 500 })
   }
+
+  const savedIds = new Set((mysaves || []).map((r: any) => r.source_upload_id))
 
   const uploads = (data || []).map((row: any) => ({
     id: row.id,
@@ -28,6 +37,7 @@ export async function GET() {
     image_url: getImageUrl(row.image_path),
     uploader_name: row.users?.display_name || 'Unknown',
     uploader_username: row.users?.username || '',
+    saved_by_me: savedIds.has(row.id),
   }))
 
   return NextResponse.json({ uploads })

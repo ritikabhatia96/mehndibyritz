@@ -21,6 +21,7 @@ interface CommunityUpload {
   created_at: string
   uploader_name: string
   uploader_username: string
+  saved_by_me: boolean
 }
 
 export default function CommunityPage() {
@@ -136,7 +137,7 @@ export default function CommunityPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {uploads.map((upload) => {
               const isOwn = upload.user_id === user?.id
-              const isSaved = saved[upload.id]
+              const isSaved = saved[upload.id] || upload.saved_by_me
               const isSaving = saving[upload.id]
               const err = errors[upload.id]
 
