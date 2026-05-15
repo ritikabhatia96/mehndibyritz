@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin, getImageUrl } from '@/lib/supabase'
 import { getSession } from '@/lib/session'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const session = await getSession()
   if (!session) {
