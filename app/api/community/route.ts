@@ -13,29 +13,22 @@ export async function GET() {
   const { data, error } = await supabaseAdmin
     .from('uploads')
     .select('id, user_id, image_path, created_at, users(display_name, username)')
+    .is('source_upload_id', null)
     .order('created_at', { ascending: false })
 
   if (error) {
     return NextResponse.json({ error: 'Failed to load community board' }, { status: 500 })
   }
 
-  // Deduplicate by image_path — only show the original (earliest) upload of each unique image
-  const seen = new Set<string>()
-  const uploads = (data || [])
-    .filter((row: any) => {
-      if (seen.has(row.image_path)) return false
-      seen.add(row.image_path)
-      return true
-    })
-    .map((row: any) => ({
-      id: row.id,
-      user_id: row.user_id,
-      image_path: row.image_path,
-      created_at: row.created_at,
-      image_url: getImageUrl(row.image_path),
-      uploader_name: row.users?.display_name || 'Unknown',
-      uploader_username: row.users?.username || '',
-    }))
+  const uploads = (data || []).map((row: any) => ({
+    id: row.id,
+    user_id: row.user_id,
+    image_path: row.image_path,
+    created_at: row.created_at,
+    image_url: getImageUrl(row.image_path),
+    uploader_name: row.users?.display_name || 'Unknown',
+    uploader_username: row.users?.username || '',
+  }))
 
   return NextResponse.json({ uploads })
 }
@@ -66,10 +59,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'This is already your photo' }, { status: 400 })
   }
 
-  // Reuse the original image_path so community board can deduplicate
+  // Save to user's board, tracking the source so community board stays clean
   const { data: newUpload, error: dbError } = await supabaseAdmin
     .from('uploads')
-    .insert({ user_id: session.id, image_path: original.image_path, comment: null })
+    .insert({
+      user_id: session.id,
+      image_path: original.image_path,
+      comment: null,
+      source_upload_id: original.id,
+    })
     .select()
     .single()
 
