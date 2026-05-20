@@ -144,7 +144,16 @@ export default function CommunityPage() {
               return (
                 <div
                   key={upload.id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border border-sage-100 hover:border-sage-300 group"
+                  className="bg-white rounded-2xl overflow-hidden group transition-all duration-200"
+                  style={{ boxShadow: '0 1px 4px rgba(139,69,19,0.06), 0 1px 2px rgba(99,140,89,0.04)' }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 28px rgba(139,69,19,0.11), 0 2px 8px rgba(99,140,89,0.07)'
+                    ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(139,69,19,0.06), 0 1px 2px rgba(99,140,89,0.04)'
+                    ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
+                  }}
                 >
                   {/* Image */}
                   <div
@@ -158,15 +167,15 @@ export default function CommunityPage() {
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 scale-95 group-hover:scale-100 bg-white/90 text-sage-700 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm">
                         View full size
                       </span>
                     </div>
                   </div>
 
                   {/* Info + save button */}
-                  <div className="p-3 flex items-center justify-between gap-2">
+                  <div className="p-3 flex items-center justify-between gap-2 border-t border-sage-50">
                     <div className="min-w-0">
                       <p className="text-xs font-medium text-gray-700 truncate">{upload.uploader_name}</p>
                       <p className="text-xs text-sage-400 truncate">@{upload.uploader_username}</p>

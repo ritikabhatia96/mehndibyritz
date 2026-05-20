@@ -23,7 +23,20 @@ export default function ImageCard({ upload, onImageClick, showComments = true }:
   const imageUrl = upload.image_url || ''
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 border border-sage-100 hover:border-sage-300 group">
+    <div
+      className="bg-white rounded-2xl overflow-hidden group transition-all duration-200"
+      style={{
+        boxShadow: '0 1px 4px rgba(139,69,19,0.06), 0 1px 2px rgba(99,140,89,0.04)',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 28px rgba(139,69,19,0.11), 0 2px 8px rgba(99,140,89,0.07)'
+        ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 4px rgba(139,69,19,0.06), 0 1px 2px rgba(99,140,89,0.04)'
+        ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
+      }}
+    >
       {/* Image */}
       <div
         className="relative w-full aspect-square cursor-pointer overflow-hidden bg-sage-50"
@@ -34,7 +47,7 @@ export default function ImageCard({ upload, onImageClick, showComments = true }:
             src={imageUrl}
             alt={upload.comment || 'Inspiration photo'}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-[1.04] transition-transform duration-500 ease-out"
             onError={() => setImgError(true)}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
@@ -57,16 +70,16 @@ export default function ImageCard({ upload, onImageClick, showComments = true }:
         )}
 
         {/* Hover overlay */}
-        <div className="absolute inset-0 bg-blush-300/0 group-hover:bg-blush-300/10 transition-colors duration-300 flex items-center justify-center">
-          <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/80 text-sage-700 text-xs font-medium px-3 py-1.5 rounded-full">
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors duration-300 flex items-center justify-center">
+          <span className="opacity-0 group-hover:opacity-100 transition-all duration-200 scale-95 group-hover:scale-100 bg-white/90 text-sage-700 text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-sm">
             View full size
           </span>
         </div>
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <p className="text-xs text-sage-400 mb-1">{formattedDate}</p>
+      <div className="p-3 border-t border-sage-50">
+        <p className="text-xs text-sage-300 mb-1">{formattedDate}</p>
 
         {showComments && (
           upload.comment ? (
